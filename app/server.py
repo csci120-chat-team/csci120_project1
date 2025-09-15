@@ -4,7 +4,7 @@ import os
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = 'supersecretkey'
 socketio = SocketIO(app)
 
 @app.route('/')
