@@ -20,7 +20,7 @@ connected_users = {}
 def broadcast_user_list():
     """Broadcast the current list of connected users to all clients"""
     user_list = list(connected_users.keys())
-    socketio.emit('user_list', user_list, broadcast=True)
+    emit('user_list', user_list, broadcast=True)
 
 @socketio.on('join')
 def handle_join(data):
@@ -48,7 +48,7 @@ def handle_typing(data):
     user = data.get('user')
     if user:
         # Broadcast typing indicator to all other users
-        emit('typing', {'user': user}, broadcast=True, include_self=False)
+        emit('typing', {'user': user}, skip_sid=request.sid)
 
 @socketio.on('disconnect')
 def handle_disconnect():
