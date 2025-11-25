@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebChat</title>
+  
+  <!-- Load Socket.IO library -->
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Header bar -->
+  <header>
+    <div>WebChat</div>
+    <div id="user-display">Not logged in</div>
+  </header>
+
+  <!-- Main chat container with sidebar -->
+  <div id="chat-container">
+    <!-- Message panel -->
+    <div id="message-panel"></div>
+    
+    <!-- Users sidebar -->
+    <div id="users-sidebar">
+      <h3>Online Users</h3>
+      <ul id="user-list"></ul>
+    </div>
+  </div>
+
+  <!-- Input area -->
+  <div id="input-area">
+    <form id="message-form">
+      <input id="message-input" type="text" autocomplete="off" placeholder="Type your message here...">
+      <button type="submit">Send</button>
+    </form>
+    <div id="typing-indicator" style="display: none;"></div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/features.js') }}"></script>
+</body>
+</html>
+

@@ -2,8 +2,11 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, send, emit
 import os
 
-
-app = Flask(__name__)
+# Get the root directory (parent of app/)
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+app = Flask(__name__, 
+            template_folder=os.path.join(root_dir, 'templates'),
+            static_folder=os.path.join(root_dir, 'static'))
 app.config['SECRET_KEY'] = 'supersecretkey'
 socketio = SocketIO(app)
 
@@ -14,6 +17,11 @@ def index():
 # Store user sessions
 connected_users = {}
 
+def broadcast_user_list():
+    """Broadcast the current list of connected users to all clients"""
+    user_list = list(connected_users.keys())
+    socketio.emit('user_list', user_list, broadcast=True)
+
 @socketio.on('join')
 def handle_join(data):
     username = data['username']
@@ -22,6 +30,7 @@ def handle_join(data):
     else:
         connected_users[username] = request.sid
         send({'user': 'System', 'msg': f'{username} has joined the chat.'}, broadcast=True)
+        broadcast_user_list()
 
 @socketio.on('message')
 def handle_message(data):
@@ -33,12 +42,21 @@ def handle_message(data):
     else:
         emit('error', {'message': 'Invalid message data!'})
 
+@socketio.on('typing')
+def handle_typing(data):
+    """Handle typing indicator events"""
+    user = data.get('user')
+    if user:
+        # Broadcast typing indicator to all other users
+        emit('typing', {'user': user}, broadcast=True, include_self=False)
+
 @socketio.on('disconnect')
 def handle_disconnect():
     for username, sid in connected_users.items():
         if sid == request.sid:
             send({'user': 'System', 'msg': f'{username} has left the chat.'}, broadcast=True)
             del connected_users[username]
+            broadcast_user_list()
             break
 
 if __name__ == '__main__':
